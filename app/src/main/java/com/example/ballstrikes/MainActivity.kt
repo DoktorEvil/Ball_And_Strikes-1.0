@@ -1,16 +1,12 @@
 package com.example.ballstrikes
 
-import androidx.compose.runtime.MutableState
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +28,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BallStrikesApp() {
-    // States to hold ball, strike, out, run, inning, and team counts
+    // States to hold team names, ball, strike, out, run, inning, and team counts
+    val awayTeamName = remember { mutableStateOf("Away Team") }
+    val homeTeamName = remember { mutableStateOf("Home Team") }
     val balls = remember { mutableStateOf(0) }
     val strikes = remember { mutableStateOf(0) }
     val outs = remember { mutableStateOf(0) }
@@ -50,6 +48,27 @@ fun BallStrikesApp() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Input fields for team names
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TextField(
+                value = awayTeamName.value,
+                onValueChange = { awayTeamName.value = it },
+                label = { Text("Away Team Name") },
+                modifier = Modifier.weight(1f)
+            )
+            TextField(
+                value = homeTeamName.value,
+                onValueChange = { homeTeamName.value = it },
+                label = { Text("Home Team Name") },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
         Text(
             text = "Inning: ${inning.value}",
             fontSize = 20.sp,
@@ -57,17 +76,19 @@ fun BallStrikesApp() {
             modifier = Modifier.padding(8.dp)
         )
         Text(
-            text = "Current Team: Team ${currentTeam.value}",
+            text = "Current Team: ${
+                if (currentTeam.value == 1) awayTeamName.value else homeTeamName.value
+            }",
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp)
         )
         Text(text = "Balls: ${balls.value}", modifier = Modifier.padding(8.dp))
         Text(text = "Strikes: ${strikes.value}", modifier = Modifier.padding(8.dp))
         Text(text = "Outs: ${outs.value}", modifier = Modifier.padding(8.dp))
-        Text(text = "Yankees Score (Current Inning): ${team1Runs.value}", modifier = Modifier.padding(8.dp))
-        Text(text = "Blue Jays Score (Current Inning): ${team2Runs.value}", modifier = Modifier.padding(8.dp))
-        Text(text = "Yankees Total Runs: ${team1TotalRuns.value}", modifier = Modifier.padding(8.dp))
-        Text(text = "Blue Jays Total Runs: ${team2TotalRuns.value}", modifier = Modifier.padding(8.dp))
+        Text(text = "${awayTeamName.value} Runs (Current Inning): ${team1Runs.value}", modifier = Modifier.padding(8.dp))
+        Text(text = "${homeTeamName.value} Runs (Current Inning): ${team2Runs.value}", modifier = Modifier.padding(8.dp))
+        Text(text = "${awayTeamName.value} Total Runs: ${team1TotalRuns.value}", modifier = Modifier.padding(8.dp))
+        Text(text = "${homeTeamName.value} Total Runs: ${team2TotalRuns.value}", modifier = Modifier.padding(8.dp))
 
         // Buttons for balls, strikes, and outs (horizontally aligned)
         Row(
@@ -144,11 +165,11 @@ fun BallStrikesApp() {
 
         // Buttons for runs
         Button(onClick = { team1Runs.value++ }, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Yankees Score Run")
+            Text(text = "Add Run to ${awayTeamName.value}")
         }
 
         Button(onClick = { team2Runs.value++ }, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Blue Jays Score Run")
+            Text(text = "Add Run to ${homeTeamName.value}")
         }
 
         // Reset button to clear all counts
